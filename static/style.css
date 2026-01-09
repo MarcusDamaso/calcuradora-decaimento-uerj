@@ -1,0 +1,81 @@
+/* Reset básico */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body {
+    background-color: #f0f2f5;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+header { text-align: center; margin-bottom: 2rem; }
+header h1 { color: #2b2d42; margin-bottom: 0.5rem; }
+header p { color: #8d99ae; }
+
+/* Abas */
+.tabs { display: flex; margin-bottom: 1.5rem; border-bottom: 2px solid #edf2f4; }
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #8d99ae;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.tab-btn:hover { color: #2b2d42; }
+.tab-btn.active { color: #4361ee; border-bottom: 3px solid #4361ee; }
+
+/* Formulários */
+.form-group { margin-bottom: 1rem; }
+.row { display: flex; gap: 1rem; }
+.row .form-group { flex: 1; }
+
+label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #edf2f4;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+input:focus { border-color: #4361ee; outline: none; }
+
+.btn-calc {
+    width: 100%;
+    padding: 12px;
+    background-color: #4361ee;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 10px;
+}
+.btn-calc:hover { background-color: #3f37c9; transform: translateY(-2px); }
+.btn-cadeia { background-color: #f72585; }
+.btn-cadeia:hover { background-color: #d00060; }
+
+/* Resultado e Gráfico */
+.result-section { margin-top: 2rem; text-align: center; border-top: 1px solid #edf2f4; padding-top: 1rem; }
+.graph-container img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}

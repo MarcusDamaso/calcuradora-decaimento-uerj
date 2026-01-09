@@ -1,0 +1,50 @@
+{
+    "Césio-137": {
+        "lambda": 0.02298,
+        "half_life": 30.17,
+        "unit": "anos",
+        "atomic_weight": 136.907
+    },
+    "Bário-137m": {
+        "lambda": 236.6,
+        "half_life": 2.55,
+        "unit": "minutos",
+        "atomic_weight": 136.9
+    },
+    "Carbono-14": {
+        "lambda": 0.000120968,
+        "half_life": 5730,
+        "unit": "anos",
+        "atomic_weight": 14.003
+    },
+    "Tório-232": {
+        "lambda": 4.95105e-11,
+        "half_life": 14000000000.0,
+        "unit": "anos",
+        "atomic_weight": 232.038
+    },
+    "Cobalto-60": {
+        "lambda": 0.1315,
+        "half_life": 5.27,
+        "unit": "anos",
+        "atomic_weight": 59.933
+    },
+    "Iodo-131": {
+        "lambda": 31.55,
+        "half_life": 8.02,
+        "unit": "dias",
+        "atomic_weight": 130.906
+    },
+    "Urânio-238": {
+        "lambda": 1.551e-10,
+        "half_life": 4468000000.0,
+        "unit": "anos",
+        "atomic_weight": 238.05
+    },
+    "sedfdfdfdfdfdfdfdffd": {
+        "lambda": 0.6931471805599453,
+        "half_life": 1.0,
+        "unit": "anos",
+        "atomic_weight": 1.0
+    }
+}
