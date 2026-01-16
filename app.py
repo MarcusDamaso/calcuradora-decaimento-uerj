@@ -6,7 +6,7 @@ from datetime import date
 from PIL import Image
 import os
 import json
-from fpdf import FPDF  # <--- Nova importação necessária
+from fpdf import FPDF
 
 # --- CONFIGURAÇÃO DE ARQUIVOS E ÍCONES ---
 ISOTOPES_FILE = "isotopes.json"
@@ -28,7 +28,41 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- ESTILIZAÇÃO CLÁSSICA (CSS) ---
+# --- CONTROLE DE TEMA (CSS HACK) ---
+# Adiciona CSS para forçar a mudança de cor da interface
+def apply_theme_css(theme):
+    if theme == "Escuro":
+        # CSS para Modo Escuro
+        st.markdown("""
+            <style>
+            [data-testid="stAppViewContainer"] {
+                background-color: #0e1117;
+                color: #fafafa;
+            }
+            [data-testid="stSidebar"] {
+                background-color: #262730;
+                color: #fafafa;
+            }
+            /* Ajuste para inputs ficarem legíveis */
+            .stTextInput > div > div > input { color: black; }
+            </style>
+            """, unsafe_allow_html=True)
+    else:
+        # CSS para Modo Claro
+        st.markdown("""
+            <style>
+            [data-testid="stAppViewContainer"] {
+                background-color: #ffffff;
+                color: #000000;
+            }
+            [data-testid="stSidebar"] {
+                background-color: #f0f2f6;
+                color: #000000;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
+# --- ESTILIZAÇÃO DE FONTE ---
 st.markdown("""
     <style>
     .stMarkdown, .stTextInput > label, .stNumberInput > label, .stSelectbox > label, .stButton > button, .stTable, .stDataFrame {
@@ -112,16 +146,21 @@ def generate_pdf_report(df, title, t_unit):
     pdf.cell(0, 10, f"Relatorio: {title}", ln=True, align="C")
     pdf.ln(10)
     
-    # Configuração da tabela
+    # Configuração da Tabela para ficar CENTRALIZADA
     pdf.set_font("Times", "B", 10)
-    col_width = pdf.w / (len(df.columns) + 1)
+    
+    # Pega a largura útil da página (Largura total - Margem Esquerda - Margem Direita)
+    # A4 padrão: 210mm. Margens padrão do FPDF: 10mm cada. Útil = 190mm.
+    page_width = pdf.w - 2 * pdf.l_margin
+    
+    # Divide a largura total pelo número de colunas -> Tabela ocupa largura total
+    col_width = page_width / len(df.columns)
     row_height = 8
 
     # Cabeçalho
     for col in df.columns:
-        # Tenta limpar caracteres que dão problema no FPDF padrão
         clean_col = str(col).replace("(", "").replace(")", "").replace("e-", "E-")
-        pdf.cell(col_width, row_height, clean_col[:15], border=1, align="C")
+        pdf.cell(col_width, row_height, clean_col[:20], border=1, align="C")
     pdf.ln()
 
     # Dados
@@ -135,7 +174,6 @@ def generate_pdf_report(df, title, t_unit):
             pdf.cell(col_width, row_height, txt, border=1, align="C")
         pdf.ln()
     
-    # Retorna o PDF como string binária
     return pdf.output(dest="S").encode("latin-1", "replace")
 
 # --- RENDERIZADOR: CALCULADORA ---
@@ -155,15 +193,40 @@ def run_simple_mode(chart_theme):
     
     with col_config:
         st.subheader("Parâmetros (Simples)")
+        
+        # Callback para atualização imediata do Lambda
+        def update_lambda_callback():
+            new_iso = st.session_state.simple_iso
+            new_lambda = st.session_state.isotopes[new_iso]["lambda"]
+            st.session_state.simple_lam = float(new_lambda)
+
         iso_list = list(st.session_state.isotopes.keys())
         idx_padrao = 0
         if "Césio-137" in iso_list:
             idx_padrao = iso_list.index("Césio-137")
             
-        selected_iso = st.selectbox("Isótopo", iso_list, index=idx_padrao, key="simple_iso")
+        selected_iso = st.selectbox(
+            "Isótopo", 
+            iso_list, 
+            index=idx_padrao, 
+            key="simple_iso", 
+            on_change=update_lambda_callback 
+        )
+        
         iso_data = st.session_state.isotopes[selected_iso]
         
-        custom_lambda = st.number_input("Lambda (anos⁻¹)", value=float(iso_data["lambda"]), format="%.4e", key="simple_lam")
+        # --- CORREÇÃO DO AVISO AMARELO ---
+        # 1. Se o valor ainda não existir no "banco de dados" do Streamlit, criamos ele agora.
+        if "simple_lam" not in st.session_state:
+            st.session_state.simple_lam = float(iso_data["lambda"])
+
+        # 2. Criamos o input SEM o argumento 'value', pois o 'key' já puxa o valor do state acima
+        custom_lambda = st.number_input(
+            "Lambda (anos⁻¹)", 
+            format="%.4e", 
+            key="simple_lam"
+        )
+        # ---------------------------------
         
         st.markdown("**Tempo**")
         c1, c2 = st.columns([2, 1])
@@ -182,14 +245,18 @@ def run_simple_mode(chart_theme):
         else:
             N0 = st.number_input("N0", value=1.0e20, format="%.4e", key="simple_n0")
             
-        steps = st.slider("Passos", 10, 500, 100, key="simple_steps")
+        steps = st.slider("Passos (Intervalos)", 10, 500, 100, key="simple_steps")
         log_scale = st.checkbox("Escala Log (Y)", value=False, key="simple_log")
 
     t_years_total = convert_time_to_years(t_val, t_unit)
     Nt_final = calculate_simple_decay(N0, custom_lambda, t_years_total)
     
     max_t = t_val if t_val > 0 else 100
-    t_plot = np.linspace(0, max_t, steps)
+    
+    # Geração dos pontos do gráfico
+    t_plot = np.linspace(0, max_t, steps + 1)
+    t_plot = np.round(t_plot, 4)
+    
     t_years_vec = [convert_time_to_years(x, t_unit) for x in t_plot]
     Nt_vec = calculate_simple_decay(N0, custom_lambda, np.array(t_years_vec))
     
@@ -219,12 +286,10 @@ def run_simple_mode(chart_theme):
         setup_graph_layout(fig, f"Decaimento de {selected_iso}", t_unit, unit_label, log_scale, chart_theme, max_t, font_dict)
         st.plotly_chart(fig, use_container_width=True)
         
-        # Dados para tabela e exportação
         data_dict = {f"Quantidade ({unit_label})": y_vals}
         show_datatable(t_plot, data_dict, t_unit, "simple_dl", report_title=f"Decaimento {selected_iso}")
 
 def run_chain_mode(chart_theme):
-    # --- MODO "EM BREVE" ---
     st.container()
     st.markdown("##")
     
@@ -239,7 +304,6 @@ def run_chain_mode(chart_theme):
             Disponível na próxima atualização.
             """
         )
-        # Placeholder visual opcional
         st.progress(0)
 
 def setup_graph_layout(fig, title, x_unit, y_unit, is_log, theme, max_x, font_dict):
@@ -266,16 +330,23 @@ def setup_graph_layout(fig, title, x_unit, y_unit, is_log, theme, max_x, font_di
     )
 
 def show_datatable(t_vec, data_cols, t_unit, key_prefix, report_title="Relatorio"):
-    # Cria o DataFrame
+    # Cria o DataFrame Base
     df_dict = {f"Tempo ({t_unit})": t_vec}
     df_dict.update(data_cols)
     df = pd.DataFrame(df_dict)
     
-    # Colunas para botões
+    # Formatação especial para CSV
+    df_csv = df.copy()
+    time_col = df_csv.columns[0]
+    df_csv[time_col] = df_csv[time_col].apply(lambda x: f"{x:.2f}")
+    
+    for col in df_csv.columns[1:]:
+        df_csv[col] = df_csv[col].apply(lambda x: f"{x:.4e}")
+
     col_csv, col_pdf = st.columns(2)
 
     # 1. Download CSV
-    csv = df.to_csv(index=False).encode('utf-8')
+    csv = df_csv.to_csv(index=False).encode('utf-8')
     col_csv.download_button(
         label="📥 Baixar CSV",
         data=csv,
@@ -297,7 +368,6 @@ def show_datatable(t_vec, data_cols, t_unit, key_prefix, report_title="Relatorio
     except Exception as e:
         col_pdf.error(f"Erro ao gerar PDF: {e}")
     
-    # Exibição Visual da Tabela
     column_config = {
         col: st.column_config.NumberColumn(format="%.4e")
         for col in df.columns
@@ -375,8 +445,16 @@ with st.sidebar:
     st.markdown("<h3 style='text-align: center; font-family: Georgia;'>UERJ - Ciência da Computação</h3>", unsafe_allow_html=True)
     page = st.radio("Menu", ["Calculadora", "Gerenciar Isótopos"])
     st.markdown("---")
+    
+    # SELETOR DE TEMA
     theme = st.radio("Tema Gráfico", ["Escuro", "Claro"], horizontal=True)
+    
+    # Aplica o CSS para a interface inteira
+    apply_theme_css(theme)
+    
+    # Define o tema do gráfico Plotly
     chart_theme = "plotly_dark" if theme == "Escuro" else "plotly"
+    
     st.caption(f"© {date.today().year} UERJ")
 
 if page == "Calculadora": render_calculator(chart_theme)
