@@ -7,6 +7,7 @@ from PIL import Image
 import os
 import json
 from fpdf import FPDF
+from streamlit_image_zoom import image_zoom
 
 # --- CONFIGURAÇÃO DE ARQUIVOS E ÍCONES ---
 ISOTOPES_FILE = "isotopes.json"
@@ -29,10 +30,8 @@ st.set_page_config(
 )
 
 # --- CONTROLE DE TEMA (CSS HACK) ---
-# Adiciona CSS para forçar a mudança de cor da interface
 def apply_theme_css(theme):
     if theme == "Escuro":
-        # CSS para Modo Escuro
         st.markdown("""
             <style>
             [data-testid="stAppViewContainer"] {
@@ -43,12 +42,10 @@ def apply_theme_css(theme):
                 background-color: #262730;
                 color: #fafafa;
             }
-            /* Ajuste para inputs ficarem legíveis */
             .stTextInput > div > div > input { color: black; }
             </style>
             """, unsafe_allow_html=True)
     else:
-        # CSS para Modo Claro
         st.markdown("""
             <style>
             [data-testid="stAppViewContainer"] {
@@ -146,14 +143,9 @@ def generate_pdf_report(df, title, t_unit):
     pdf.cell(0, 10, f"Relatorio: {title}", ln=True, align="C")
     pdf.ln(10)
     
-    # Configuração da Tabela para ficar CENTRALIZADA
+    # Configuração da Tabela
     pdf.set_font("Times", "B", 10)
-    
-    # Pega a largura útil da página (Largura total - Margem Esquerda - Margem Direita)
-    # A4 padrão: 210mm. Margens padrão do FPDF: 10mm cada. Útil = 190mm.
     page_width = pdf.w - 2 * pdf.l_margin
-    
-    # Divide a largura total pelo número de colunas -> Tabela ocupa largura total
     col_width = page_width / len(df.columns)
     row_height = 8
 
@@ -180,7 +172,7 @@ def generate_pdf_report(df, title, t_unit):
 def render_calculator(chart_theme):
     st.title("Calculadora de Decaimento Radioativo")
     st.markdown("---")
-    mode_tab1, mode_tab2 = st.tabs(["Decaimento Simples (A → Estável)", "Decaimento em Cadeia (A → B → C)"])
+    mode_tab1, mode_tab2 = st.tabs(["Decaimento Simples (A → Estável)", "Decaimento em Cadeia (Séries Naturais)"])
 
     with mode_tab1:
         run_simple_mode(chart_theme)
@@ -194,7 +186,6 @@ def run_simple_mode(chart_theme):
     with col_config:
         st.subheader("Parâmetros (Simples)")
         
-        # Callback para atualização imediata do Lambda
         def update_lambda_callback():
             new_iso = st.session_state.simple_iso
             new_lambda = st.session_state.isotopes[new_iso]["lambda"]
@@ -215,18 +206,14 @@ def run_simple_mode(chart_theme):
         
         iso_data = st.session_state.isotopes[selected_iso]
         
-        # --- CORREÇÃO DO AVISO AMARELO ---
-        # 1. Se o valor ainda não existir no "banco de dados" do Streamlit, criamos ele agora.
         if "simple_lam" not in st.session_state:
             st.session_state.simple_lam = float(iso_data["lambda"])
 
-        # 2. Criamos o input SEM o argumento 'value', pois o 'key' já puxa o valor do state acima
         custom_lambda = st.number_input(
             "Lambda (anos⁻¹)", 
             format="%.4e", 
             key="simple_lam"
         )
-        # ---------------------------------
         
         st.markdown("**Tempo**")
         c1, c2 = st.columns([2, 1])
@@ -253,10 +240,7 @@ def run_simple_mode(chart_theme):
     
     max_t = t_val if t_val > 0 else 100
     
-    # Geração dos pontos do gráfico
     t_plot = np.linspace(0, max_t, steps + 1)
-    t_plot = np.round(t_plot, 4)
-    
     t_years_vec = [convert_time_to_years(x, t_unit) for x in t_plot]
     Nt_vec = calculate_simple_decay(N0, custom_lambda, np.array(t_years_vec))
     
@@ -282,31 +266,63 @@ def run_simple_mode(chart_theme):
             text=hover_txt, hoverinfo="text"
         ))
         
-        font_dict = dict(family="Times New Roman", size=14)
-        setup_graph_layout(fig, f"Decaimento de {selected_iso}", t_unit, unit_label, log_scale, chart_theme, max_t, font_dict)
+        setup_graph_layout(fig, f"Decaimento de {selected_iso}", t_unit, unit_label, log_scale, chart_theme, max_t)
         st.plotly_chart(fig, use_container_width=True)
         
         data_dict = {f"Quantidade ({unit_label})": y_vals}
         show_datatable(t_plot, data_dict, t_unit, "simple_dl", report_title=f"Decaimento {selected_iso}")
 
+# --- NOVA FUNÇÃO: DECAIMENTO EM CADEIA (VISUAL) ---
+# --- SUBSTITUA APENAS A FUNÇÃO run_chain_mode POR ESTA ---
 def run_chain_mode(chart_theme):
     st.container()
-    st.markdown("##")
+    st.markdown("### Seleção de Séries Naturais")
+    st.markdown("---")
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        st.warning("⚠️ **Módulo em Desenvolvimento**")
-        st.info(
-            """
-            A funcionalidade de **Decaimento em Cadeia (Equações de Bateman)** está passando por manutenção e melhorias na interface.
-            
-            Disponível na próxima atualização.
-            """
-        )
-        st.progress(0)
+    chain_images = {
+        "Série do Urânio (U-238)": "uranium_chain.png",
+        "Série do Tório (Th-232)": "thorium_chain.png",
+        "Série do Actínio (U-235)": "actinium_chain.png"
+    }
 
-def setup_graph_layout(fig, title, x_unit, y_unit, is_log, theme, max_x, font_dict):
+    # Mantendo o layout que joga a imagem para a direita
+    col_select, col_space, col_image = st.columns([1, 0.3, 2])
+
+    with col_select:
+        st.subheader("Configuração")
+        selected_chain = st.selectbox("Selecione a Cadeia:", list(chain_images.keys()))
+        
+        st.info(f"Cadeia Ativa:\n**{selected_chain}**")
+        st.markdown("---")
+
+    with col_image:
+        st.subheader("Visualização da série")
+        st.caption("🖱️ Use o scroll do mouse para zoom e clique para arrastar.")
+        
+        image_name = chain_images[selected_chain]
+        
+        img_path = None
+        if os.path.exists(image_name):
+            img_path = image_name
+        elif os.path.exists(os.path.join("assets", image_name)):
+            img_path = os.path.join("assets", image_name)
+            
+        if img_path:
+            pil_image = Image.open(img_path)
+            
+            image_zoom(
+                pil_image,
+                mode="scroll",
+                # AUMENTEI AQUI: De (700, 500) para (700, 700)
+                size=(700, 700), 
+                keep_aspect_ratio=True,
+                zoom_factor=4.0,
+                increment=0.2
+            )
+        else:
+            st.error(f"Imagem '{image_name}' não encontrada.")
+
+def setup_graph_layout(fig, title, x_unit, y_unit, is_log, theme, max_x):
     custom_ticks = np.linspace(0, max_x, 6)
     x_range_max = max_x * 1.05
     
@@ -318,7 +334,7 @@ def setup_graph_layout(fig, title, x_unit, y_unit, is_log, theme, max_x, font_di
         template=theme,
         height=500,
         hovermode="x unified",
-        font=font_dict,
+        font=dict(family="Times New Roman", size=14),
         yaxis=dict(autorange=True),
         xaxis=dict(
             range=[0, x_range_max],
@@ -337,12 +353,7 @@ def show_datatable(t_vec, data_cols, t_unit, key_prefix, report_title="Relatorio
     
     # Formatação especial para CSV
     df_csv = df.copy()
-    time_col = df_csv.columns[0]
-    df_csv[time_col] = df_csv[time_col].apply(lambda x: f"{x:.2f}")
     
-    for col in df_csv.columns[1:]:
-        df_csv[col] = df_csv[col].apply(lambda x: f"{x:.4e}")
-
     col_csv, col_pdf = st.columns(2)
 
     # 1. Download CSV
@@ -368,17 +379,11 @@ def show_datatable(t_vec, data_cols, t_unit, key_prefix, report_title="Relatorio
     except Exception as e:
         col_pdf.error(f"Erro ao gerar PDF: {e}")
     
-    column_config = {
-        col: st.column_config.NumberColumn(format="%.4e")
-        for col in df.columns
-    }
-    
     st.dataframe(
         df,
-        column_config=column_config,
-        hide_index=True,
         use_container_width=True,
-        height=300
+        height=300,
+        hide_index=True
     )
 
 def render_manager():
