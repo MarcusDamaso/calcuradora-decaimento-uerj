@@ -1,0 +1,1 @@
+Projeto de iniciação científica que busca estudar o fenomeno fisico do decaimento radioativo , até o momento simples/em cadeia . a aplicação consiste em uma calculadora para conseguir analisar este fenomeno com mais precisão.
