@@ -6,22 +6,16 @@
         "atomic_weight": 136.907
     },
     "Bário-137m": {
-        "lambda": 236.6,
-        "half_life": 2.55,
-        "unit": "minutos",
+        "lambda": 142916.0,
+        "half_life": 4.85e-06,
+        "unit": "anos",
         "atomic_weight": 136.9
     },
     "Carbono-14": {
-        "lambda": 0.000120968,
-        "half_life": 5730,
+        "lambda": 0.0001209,
+        "half_life": 5730.0,
         "unit": "anos",
         "atomic_weight": 14.003
-    },
-    "Tório-232": {
-        "lambda": 4.95105e-11,
-        "half_life": 14000000000.0,
-        "unit": "anos",
-        "atomic_weight": 232.038
     },
     "Cobalto-60": {
         "lambda": 0.1315,
@@ -30,21 +24,99 @@
         "atomic_weight": 59.933
     },
     "Iodo-131": {
-        "lambda": 31.55,
-        "half_life": 8.02,
-        "unit": "dias",
+        "lambda": 31.56,
+        "half_life": 0.02195,
+        "unit": "anos",
         "atomic_weight": 130.906
     },
-    "Urânio-238": {
-        "lambda": 1.551e-10,
-        "half_life": 4468000000.0,
+    "U-238": {
+        "lambda": 1.5403e-10,
+        "half_life": 4500000000.0,
         "unit": "anos",
         "atomic_weight": 238.05
     },
-    "sedfdfdfdfdfdfdfdffd": {
-        "lambda": 0.6931471805599453,
-        "half_life": 1.0,
+    "Th-234": {
+        "lambda": 10.504,
+        "half_life": 0.06598,
         "unit": "anos",
-        "atomic_weight": 1.0
+        "atomic_weight": 234.04
+    },
+    "Pa-234": {
+        "lambda": 311544.0,
+        "half_life": 2.22e-06,
+        "unit": "anos",
+        "atomic_weight": 234.04
+    },
+    "U-234": {
+        "lambda": 2.8234e-06,
+        "half_life": 245500.0,
+        "unit": "anos",
+        "atomic_weight": 234.04
+    },
+    "Th-230": {
+        "lambda": 9.1954e-06,
+        "half_life": 75380.0,
+        "unit": "anos",
+        "atomic_weight": 230.03
+    },
+    "Ra-226": {
+        "lambda": 0.00043267,
+        "half_life": 1602.0,
+        "unit": "anos",
+        "atomic_weight": 226.02
+    },
+    "Rn-222": {
+        "lambda": 66.626,
+        "half_life": 0.0104,
+        "unit": "anos",
+        "atomic_weight": 222.01
+    },
+    "Po-218": {
+        "lambda": 117548.0,
+        "half_life": 5.89e-06,
+        "unit": "anos",
+        "atomic_weight": 218.0
+    },
+    "Pb-214": {
+        "lambda": 13598.0,
+        "half_life": 5.09e-05,
+        "unit": "anos",
+        "atomic_weight": 214.0
+    },
+    "Bi-214": {
+        "lambda": 18221.0,
+        "half_life": 3.8e-05,
+        "unit": "anos",
+        "atomic_weight": 213.99
+    },
+    "Po-214": {
+        "lambda": 133400000000.0,
+        "half_life": 5.19e-12,
+        "unit": "anos",
+        "atomic_weight": 213.99
+    },
+    "Pb-210": {
+        "lambda": 0.03108,
+        "half_life": 22.3,
+        "unit": "anos",
+        "atomic_weight": 209.98
+    },
+    "Bi-210": {
+        "lambda": 50.636,
+        "half_life": 0.0137,
+        "unit": "anos",
+        "atomic_weight": 209.98
+    },
+    "Po-210": {
+        "lambda": 1.8336,
+        "half_life": 0.3778,
+        "unit": "anos",
+        "atomic_weight": 209.98
+    },
+    "Pb-206": {
+        "lambda": 0.0,
+        "half_life": 0.0,
+        "unit": "anos",
+        "atomic_weight": 205.97
     }
 }
