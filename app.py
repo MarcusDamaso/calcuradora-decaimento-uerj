@@ -92,7 +92,7 @@ DEFAULT_ISOTOPES = {
     "Po-218":     {"lambda": 117548.0,   "half_life": 5.89e-6,   "unit": "anos", "atomic_weight": 218.00},
     "Pb-214":     {"lambda": 13598.0,    "half_life": 5.09e-5,   "unit": "anos", "atomic_weight": 214.00},
     "Bi-214":     {"lambda": 18221.0,    "half_life": 3.80e-5,   "unit": "anos", "atomic_weight": 213.99},
-    "Po-214":     {"lambda": 1.334e+11,  "half_life": 5.19e-12,  "unit": "anos", "atomic_weight": 213.99},
+    "Ti-210":     {"lambda": 1.334e+11,  "half_life": 5.19e-12,  "unit": "anos", "atomic_weight": 213.99},
     "Pb-210":     {"lambda": 0.03108,    "half_life": 22.3,      "unit": "anos", "atomic_weight": 209.98},
     "Bi-210":     {"lambda": 50.636,     "half_life": 0.0137,    "unit": "anos", "atomic_weight": 209.98},
     "Po-210":     {"lambda": 1.8336,     "half_life": 0.3778,    "unit": "anos", "atomic_weight": 209.98},
@@ -111,7 +111,6 @@ URANIUM_SERIES_DATA = {
     "Po-218": {"half_life_label": "5.9e-6 Anos",      "lambda": 117548.0},
     "Pb-214": {"half_life_label": "5.1e-5 Anos",      "lambda": 13598.0},
     "Bi-214": {"half_life_label": "3.8e-5 Anos",      "lambda": 18221.0},
-    "Po-214": {"half_life_label": "5.2e-12 Anos",     "lambda": 1.334e+11},
     "Tl-210": {"half_life_label": "2.5e-6 Anos",      "lambda": 280329.0},
     "Pb-210": {"half_life_label": "22.3 Anos",        "lambda": 0.03108},
     "Bi-210": {"half_life_label": "0.0137 Anos",      "lambda": 50.636},
@@ -121,7 +120,7 @@ URANIUM_SERIES_DATA = {
 
 URANIUM_SERIES_ORDER = [
     "U-238", "Th-234", "Pa-234", "U-234", "Th-230", "Ra-226", 
-    "Rn-222", "Po-218", "Pb-214", "Bi-214", "Po-214", "Pb-210", 
+    "Rn-222", "Po-218", "Pb-214", "Bi-214", "Tl-210", "Pb-210", 
     "Bi-210", "Po-210", "Pb-206"
 ]
 
@@ -219,12 +218,25 @@ def run_simple_mode(chart_theme):
             new_iso = st.session_state.simple_iso
             new_lambda = st.session_state.isotopes[new_iso]["lambda"]
             st.session_state.simple_lam = float(new_lambda)
+            
+            # Salva o isótopo de forma segura
+            st.session_state.iso_escolhido = new_iso
 
         iso_list = list(st.session_state.isotopes.keys())
+
+        # 1. Se a variável protegida não existir, cria com padrão
+        if "iso_escolhido" not in st.session_state:
+            st.session_state.iso_escolhido = "Césio-137" if "Césio-137" in iso_list else iso_list[0]
+
+        # 2. Descobre o índice correto do isótopo salvo
         idx_padrao = 0
-        if "Césio-137" in iso_list: idx_padrao = iso_list.index("Césio-137")
+        if st.session_state.iso_escolhido in iso_list:
+            idx_padrao = iso_list.index(st.session_state.iso_escolhido)
             
+        # 3. Monta o selectbox (único!) usando o índice certo
         selected_iso = st.selectbox("Isótopo", iso_list, index=idx_padrao, key="simple_iso", on_change=update_lambda_callback)
+        
+        # Pega os dados do isótopo selecionado
         iso_data = st.session_state.isotopes[selected_iso]
         
         if "simple_lam" not in st.session_state:
@@ -238,6 +250,7 @@ def run_simple_mode(chart_theme):
 
         st.markdown("---")
         st.markdown("**Tempo de Simulação**")
+        
         c1, c2 = st.columns([2, 1])
         t_val = c1.number_input("Duração", value=100.0, key="simple_t", format="%.2f")
         t_unit = c2.selectbox("Unidade", list(CONVERSIONS_TO_YEARS.keys()), index=4, key="simple_unit")
@@ -374,19 +387,13 @@ def render_manager():
                     st.success("Salvo!")
                     st.rerun()
     with c2:
-        st.subheader("Remover / Resetar")
-        to_del = st.selectbox("Isótopo", list(st.session_state.isotopes.keys()))
-        if st.button("Remover"):
-            if len(st.session_state.isotopes) > 1:
-                del st.session_state.isotopes[to_del]
-                save_isotopes_to_file(st.session_state.isotopes)
-                st.success("Removido!")
-                st.rerun()
-            else:
-                st.error("Mínimo 1 isótopo necessário.")
+        st.subheader("Restaurar Banco de Dados")
+        st.write("Caso a lista de isótopos esteja incompleta ou você queira voltar aos valores originais, clique no botão abaixo.")
+        
         if st.button("Restaurar Padrões (Recomendado)"):
             st.session_state.isotopes = DEFAULT_ISOTOPES.copy()
             save_isotopes_to_file(st.session_state.isotopes)
+            st.success("Banco de dados restaurado com sucesso!")
             st.rerun()
 
 # --- SIDEBAR ---
