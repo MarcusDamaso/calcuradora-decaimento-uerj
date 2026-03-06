@@ -6,6 +6,7 @@ from PIL import Image
 import os
 import json
 from fpdf import FPDF
+from n_t import calcular_decaimento
 
 # --- TENTATIVA DE IMPORTAR PLOTLY ---
 try:
@@ -322,33 +323,109 @@ def run_simple_mode(chart_theme):
         )
 
 def run_chain_mode_visual():
-    st.markdown("### Série de Decaimento do Urânio-238")
-    col_config, col_image = st.columns([1, 1.5])
+    st.markdown("### Simulação de Decaimento em Cadeia")
+    
+    col_config, col_image = st.columns([1, 1.2])
     
     with col_config:
-        st.subheader("Configuração da Seleção")
+        st.subheader("1. Recorte da Cadeia")
+        
+        # Seleção do trecho exato (Pai e Filho)
         start_element = st.selectbox("Começar em (Pai):", URANIUM_SERIES_ORDER[:-1], index=0)
         start_idx = URANIUM_SERIES_ORDER.index(start_element)
+        
         available_ends = URANIUM_SERIES_ORDER[start_idx+1:]
         end_element = st.selectbox("Terminar em (Filho):", available_ends, index=len(available_ends)-1)
         end_idx = URANIUM_SERIES_ORDER.index(end_element)
         
-        selected_chain = URANIUM_SERIES_ORDER[start_idx : end_idx+1]
-        st.info(f"Trecho selecionado: **{' → '.join(selected_chain)}**")
-        st.markdown("---")
+        # ESTA VARIÁVEL É O FILTRO REAL:
+        cadeia_recortada = URANIUM_SERIES_ORDER[start_idx : end_idx+1]
+        st.info(f"Trecho calculado: **{' → '.join(cadeia_recortada)}**")
         
-        hl_pai = URANIUM_SERIES_DATA[start_element]["half_life_label"]
-        st.write(f"Meia-vida de **{start_element}**: {hl_pai}")
-        st.caption("Esta aba é apenas para visualização da cadeia.")
+        st.markdown("---")
+        st.subheader("2. Tempo de Simulação (t)")
+        c_t1, c_t2 = st.columns(2)
+        t_val = c_t1.number_input("Duração", value=10.00, min_value=0.00, format="%.2f", key="t_input_chain")
+        t_unit = c_t2.selectbox("Unidade", list(CONVERSIONS_TO_YEARS.keys()), index=4)
+        
+        st.markdown("---")
+        st.subheader("3. Massas Iniciais (g)")
+        
+        # Multiselect limitado estritamente ao recorte selecionado
+        present_isotopes = st.multiselect(
+            "Isótopos na amostra inicial:",
+            options=cadeia_recortada,
+            default=[start_element]
+        )
+        
+        inputs_massa = {}
+        for iso in present_isotopes:
+            inputs_massa[iso] = st.number_input(
+                f"Massa de {iso} (g)", 
+                value=100.00 if iso == start_element else 0.00, 
+                min_value=0.00, 
+                format="%.2f", 
+                key=f"m_input_{iso}"
+            )
+                
+        # Monta o vetor inicial m0 apenas para os elementos do recorte
+        vetor_massas_iniciais = [inputs_massa.get(iso, 0.00) for iso in cadeia_recortada]
+        
+        st.markdown("---")
+        if st.button("Calcular Decaimento", type="primary", use_container_width=True):
+            lambdas_cadeia = [URANIUM_SERIES_DATA[iso]["lambda"] for iso in cadeia_recortada]
+            tempo_em_anos = convert_time_to_years(t_val, t_unit)
+            
+            try:
+                # O backend deve receber apenas os dados do recorte
+                massas_finais = calcular_decaimento(
+                    cadeia_recortada, 
+                    vetor_massas_iniciais, 
+                    lambdas_cadeia, 
+                    tempo_em_anos
+                )
+                
+                st.success("Cálculo concluído!")
+                st.markdown("### Resultados Finais")
+                
+                # CORREÇÃO CRUCIAL: Criamos o DataFrame usando APENAS a cadeia_recortada.
+                # Se massas_finais vier maior que o recorte, pegamos apenas os primeiros N elementos.
+                df_resultado = pd.DataFrame({
+                    "Isótopo": cadeia_recortada,
+                    "Massa Final (g)": massas_finais[:len(cadeia_recortada)]
+                })
+                
+                # Exibição forçada em 2 casas decimais (%.2f)
+                st.dataframe(
+                    df_resultado,
+                    hide_index=True,
+                    use_container_width=True,
+                    column_config={
+                        "Massa Final (g)": st.column_config.NumberColumn(format="%.2f")
+                    }
+                )
+                
+            except Exception as e:
+                st.error(f"Erro no cálculo: {e}")
 
     with col_image:
         st.subheader("Mapa da Série Natural")
-        img_path = CHAIN_IMAGE_FILE
-        if not os.path.exists(img_path): img_path = os.path.join("assets", CHAIN_IMAGE_FILE)
-        if os.path.exists(img_path):
-            st.image(img_path, caption="Série de decaimento U-238", use_container_width=True)
-        else:
-            st.warning(f"⚠️ Imagem não encontrada: `{CHAIN_IMAGE_FILE}`")
+        if os.path.exists(CHAIN_IMAGE_FILE):
+            st.image(CHAIN_IMAGE_FILE, use_container_width=True)
+            
+        with st.expander(f"Vetor de Entrada ({len(cadeia_recortada)} elementos)"):
+            df_m0 = pd.DataFrame({
+                "Isótopo": cadeia_recortada, 
+                "Massa Inicial (g)": vetor_massas_iniciais
+            })
+            st.dataframe(
+                df_m0, 
+                hide_index=True, 
+                use_container_width=True,
+                column_config={"Massa Inicial (g)": st.column_config.NumberColumn(format="%.2f")}
+            )
+    
+    
 
 def render_manager():
     st.title("Gerenciador de Isótopos")
