@@ -77,12 +77,15 @@ CONVERSIONS_TO_YEARS = {
 }
 
 # --- BANCO DE DADOS COMPLETO ---
+
 DEFAULT_ISOTOPES = {
     "Césio-137":  {"lambda": 0.02298,   "half_life": 30.17,    "unit": "anos", "atomic_weight": 136.907},
     "Bário-137m": {"lambda": 142916.0,  "half_life": 4.85e-6,  "unit": "anos", "atomic_weight": 136.9},
     "Carbono-14": {"lambda": 1.209e-4,  "half_life": 5730.0,   "unit": "anos", "atomic_weight": 14.003},
     "Cobalto-60": {"lambda": 0.1315,    "half_life": 5.27,     "unit": "anos", "atomic_weight": 59.933},
     "Iodo-131":   {"lambda": 31.56,     "half_life": 0.02195,  "unit": "anos", "atomic_weight": 130.906},
+    
+    # --- SÉRIE DO URÂNIO (U-238) ---
     "U-238":      {"lambda": 1.5403e-10, "half_life": 4.5e9,     "unit": "anos", "atomic_weight": 238.05},
     "Th-234":     {"lambda": 10.504,     "half_life": 0.06598,   "unit": "anos", "atomic_weight": 234.04},
     "Pa-234":     {"lambda": 311544.0,   "half_life": 2.22e-6,   "unit": "anos", "atomic_weight": 234.04},
@@ -97,16 +100,66 @@ DEFAULT_ISOTOPES = {
     "Pb-210":     {"lambda": 0.03108,    "half_life": 22.3,      "unit": "anos", "atomic_weight": 209.98},
     "Bi-210":     {"lambda": 50.636,     "half_life": 0.0137,    "unit": "anos", "atomic_weight": 209.98},
     "Po-210":     {"lambda": 1.8336,     "half_life": 0.3778,    "unit": "anos", "atomic_weight": 209.98},
-    "Pb-206":     {"lambda": 0.0,        "half_life": 0.0,       "unit": "anos", "atomic_weight": 205.97}
+    "Pb-206":     {"lambda": 0.0,        "half_life": 0.0,       "unit": "anos", "atomic_weight": 205.97},
+
+    # --- SÉRIE DO ACTÍNIO (U-235) (Adicione os valores corretos de lambda/meia vida) ---
+    "U-235":      {"lambda": 9.85e-10,   "half_life": 7.04e8,    "unit": "anos", "atomic_weight": 235.04},
+    "Th-231":     {"lambda": 238.3,      "half_life": 2.9e-3,    "unit": "anos", "atomic_weight": 231.04},
+    "Pa-231":     {"lambda": 2.11e-5,    "half_life": 32760.0,   "unit": "anos", "atomic_weight": 231.04},
+    "Ac-227":     {"lambda": 0.0318,     "half_life": 21.77,     "unit": "anos", "atomic_weight": 227.03},
+    "Th-227":     {"lambda": 13.56,      "half_life": 0.051,     "unit": "anos", "atomic_weight": 227.03},
+    "Ra-223":     {"lambda": 22.18,      "half_life": 0.031,     "unit": "anos", "atomic_weight": 223.02},
+    "Rn-219":     {"lambda": 5.5e6,      "half_life": 1.25e-7,   "unit": "anos", "atomic_weight": 219.01},
+    "Po-215":     {"lambda": 1.23e10,    "half_life": 5.6e-11,   "unit": "anos", "atomic_weight": 215.0},
+    "Pb-211":     {"lambda": 10141.0,    "half_life": 6.83e-5,   "unit": "anos", "atomic_weight": 211.0},
+    "Bi-211":     {"lambda": 170138.0,   "half_life": 4.07e-6,   "unit": "anos", "atomic_weight": 211.0},
+    "Tl-207":     {"lambda": 76395.0,    "half_life": 9.07e-6,   "unit": "anos", "atomic_weight": 207.0},
+    "Pb-207":     {"lambda": 0.0,        "half_life": 0.0,       "unit": "anos", "atomic_weight": 206.98},
+
+    # --- SÉRIE DO TÓRIO (Th-232) (Adicione os valores corretos de lambda/meia vida) ---
+    "Th-232":     {"lambda": 4.95e-11,   "half_life": 1.40e10,   "unit": "anos", "atomic_weight": 232.04},
+    "Ra-228":     {"lambda": 0.1205,     "half_life": 5.75,      "unit": "anos", "atomic_weight": 228.03},
+    "Ac-228":     {"lambda": 986.7,      "half_life": 7.02e-4,   "unit": "anos", "atomic_weight": 228.03},
+    "Th-228":     {"lambda": 0.3627,     "half_life": 1.91,      "unit": "anos", "atomic_weight": 228.03},
+    "Ra-224":     {"lambda": 69.7,       "half_life": 9.94e-3,   "unit": "anos", "atomic_weight": 224.02},
+    "Rn-220":     {"lambda": 3.9e5,      "half_life": 1.76e-6,   "unit": "anos", "atomic_weight": 220.01},
+    "Po-216":     {"lambda": 1.5e8,      "half_life": 4.6e-9,    "unit": "anos", "atomic_weight": 216.0},
+    "Pb-212":     {"lambda": 571.4,      "half_life": 1.21e-3,   "unit": "anos", "atomic_weight": 212.0},
+    "Bi-212":     {"lambda": 6013.0,     "half_life": 1.15e-4,   "unit": "anos", "atomic_weight": 212.0},
+    "Tl-208":     {"lambda": 119436.0,   "half_life": 5.8e-6,    "unit": "anos", "atomic_weight": 208.0},
+    "Pb-208":     {"lambda": 0.0,        "half_life": 0.0,       "unit": "anos", "atomic_weight": 207.98}
 }
 
-URANIUM_SERIES_DATA = DEFAULT_ISOTOPES.copy()
-
+# Definição das listas de ordem de cada série
 URANIUM_SERIES_ORDER = [
     "U-238", "Th-234", "Pa-234", "U-234", "Th-230", "Ra-226", 
     "Rn-222", "Po-218", "Pb-214", "Bi-214", "Tl-210", "Pb-210", 
     "Bi-210", "Po-210", "Pb-206"
 ]
+
+ACTINIUM_SERIES_ORDER = [
+    "U-235", "Th-231", "Pa-231", "Ac-227", "Th-227", "Ra-223", 
+    "Rn-219", "Po-215", "Pb-211", "Bi-211", "Tl-207", "Pb-207"
+]
+
+THORIUM_SERIES_ORDER = [
+    "Th-232", "Ra-228", "Ac-228", "Th-228", "Ra-224", "Rn-220", 
+    "Po-216", "Pb-212", "Bi-212", "Po-212", "Tl-208", "Pb-208"
+]
+
+# Mapeamento para uso no Streamlit
+SERIES_MAP = {
+    "Série do Urânio (U-238)": URANIUM_SERIES_ORDER,
+    "Série do Actínio (U-235)": ACTINIUM_SERIES_ORDER,
+    "Série do Tório (Th-232)": THORIUM_SERIES_ORDER
+}
+
+IMAGE_MAP = {
+    "Série do Urânio (U-238)": "uranium_chain.png",
+    "Série do Actínio (U-235)": "actinium_chain.png",
+    "Série do Tório (Th-232)": "thorium_chain.png"
+}
+
 
 # --- FUNÇÕES NÚCLEO (MATRIZES E CACHE) ---
 @st.cache_data
@@ -314,19 +367,26 @@ def run_simple_mode(chart_theme):
 def run_chain_mode_visual(chart_theme):
     st.markdown("### Simulação de Decaimento em Cadeia")
     
+    # --- NOVO: SELEÇÃO DA CADEIA ---
+    nome_cadeia = st.selectbox("Escolha a Série de Decaimento:", list(SERIES_MAP.keys()))
+    cadeia_selecionada = SERIES_MAP[nome_cadeia]
+    
+    st.markdown("---")
+    
     col_config, col_image = st.columns([1, 1.2])
     
     with col_config:
         st.subheader("1. Recorte da Cadeia")
         
-        start_element = st.selectbox("Começar em (Pai):", URANIUM_SERIES_ORDER[:-1], index=0)
-        start_idx = URANIUM_SERIES_ORDER.index(start_element)
+        # Agora usa a cadeia_selecionada ao invés do URANIUM_SERIES_ORDER fixo
+        start_element = st.selectbox("Começar em (Pai):", cadeia_selecionada[:-1], index=0)
+        start_idx = cadeia_selecionada.index(start_element)
         
-        available_ends = URANIUM_SERIES_ORDER[start_idx+1:]
+        available_ends = cadeia_selecionada[start_idx+1:]
         end_element = st.selectbox("Terminar em (Filho):", available_ends, index=len(available_ends)-1)
-        end_idx = URANIUM_SERIES_ORDER.index(end_element)
+        end_idx = cadeia_selecionada.index(end_element)
         
-        cadeia_recortada = URANIUM_SERIES_ORDER[start_idx : end_idx+1]
+        cadeia_recortada = cadeia_selecionada[start_idx : end_idx+1]
         st.info(f"Trecho calculado: **{' → '.join(cadeia_recortada)}**")
         
         st.markdown("---")
@@ -340,24 +400,35 @@ def run_chain_mode_visual(chart_theme):
 
         st.markdown("---")
         st.subheader("3. Massas Iniciais (g)")
+        st.write("Marque os isótopos que existem na sua amostra inicial e informe sua massa inicial:")
         
-        present_isotopes = st.multiselect(
-            "Isótopos na amostra inicial:",
-            options=cadeia_recortada,
-            default=[start_element]
-        )
+        present_isotopes = []
+        num_cols_chk = 4
+        cols_chk = st.columns(num_cols_chk)
+        
+        for i, iso in enumerate(cadeia_recortada):
+            with cols_chk[i % num_cols_chk]:
+                is_checked = st.checkbox(iso, value=(iso == start_element), key=f"chk_m0_{iso}")
+                if is_checked:
+                    present_isotopes.append(iso)
         
         inputs_massa = {}
-        for iso in present_isotopes:
-            inputs_massa[iso] = st.number_input(
-                f"Massa de {iso} (g)", 
-                value=100.00 if iso == start_element else 0.00, 
-                min_value=0.00, 
-                format="%.4E", 
-                step=1e-2,
-                key=f"m_input_{iso}"
-            )
-                
+        if present_isotopes:
+            st.markdown("<br>**Defina a massa (g) para os elementos selecionados:**", unsafe_allow_html=True)
+            num_cols_inputs = 3
+            cols_inputs = st.columns(num_cols_inputs)
+            
+            for i, iso in enumerate(present_isotopes):
+                with cols_inputs[i % num_cols_inputs]:
+                    inputs_massa[iso] = st.number_input(
+                        iso, 
+                        value=100.0 if iso == start_element else 0.0, 
+                        min_value=0.0, 
+                        format="%.4f",
+                        step=0.01,
+                        key=f"m_input_{iso}"
+                    )
+        
         vetor_massas_iniciais = np.array([inputs_massa.get(iso, 0.00) for iso in cadeia_recortada])
         
         st.markdown("---")
@@ -365,9 +436,17 @@ def run_chain_mode_visual(chart_theme):
             st.session_state['mostrar_resultados_cadeia'] = True
 
     with col_image:
-        st.subheader("Mapa da Série Natural")
-        if os.path.exists(CHAIN_IMAGE_FILE):
-            st.image(CHAIN_IMAGE_FILE, use_container_width=True)
+    
+        st.subheader("Mapa da Série")
+        
+        # 1. Pega o nome do arquivo de imagem correto no dicionário
+        imagem_atual = IMAGE_MAP.get(nome_cadeia, "")
+        
+        # 2. Verifica se a imagem existe no seu computador e a exibe
+        if os.path.exists(imagem_atual):
+            st.image(imagem_atual, use_container_width=True, caption=f"Representação da {nome_cadeia}")
+        else:
+            st.warning(f"⚠️ Imagem não encontrada: {imagem_atual}. Salve a foto na pasta do projeto!")
             
         with st.expander(f"Vetor de Entrada ({len(present_isotopes)} isótopos presentes)"):
             df_m0 = pd.DataFrame({
@@ -375,7 +454,6 @@ def run_chain_mode_visual(chart_theme):
                 "Massa Inicial (g)": vetor_massas_iniciais
             })
             
-            # FILTRO: Mostra APENAS os elementos que o usuário marcou na amostra inicial
             df_m0_display = df_m0[df_m0["Isótopo"].isin(present_isotopes)].copy()
             df_m0_display["Massa Inicial (g)"] = df_m0_display["Massa Inicial (g)"].apply(lambda x: f"{x:.4E}")
             st.dataframe(df_m0_display, hide_index=True, use_container_width=True)
@@ -385,15 +463,13 @@ def run_chain_mode_visual(chart_theme):
         st.markdown("---")
         st.markdown("## Resultados do Cálculo")
         
-        # Movi o seletor para cima, assim ele controla a Tabela e o Gráfico juntos
-        st.markdown("#### Exibição dos Dados")
-        isotopos_para_plotar = st.multiselect(
-            "Escolha quais isótopos visualizar na tabela e no gráfico:",
-            options=cadeia_recortada,
-            default=present_isotopes 
-        )
-        
-        lambdas_cadeia = [URANIUM_SERIES_DATA[iso]["lambda"] for iso in cadeia_recortada]
+        # --- NOVO: Puxando o lambda do session_state geral (que reflete edições no Gerenciador) ---
+        try:
+            lambdas_cadeia = [st.session_state.isotopes[iso]["lambda"] for iso in cadeia_recortada]
+        except KeyError as e:
+            st.error(f"Erro: O isótopo {e} não foi encontrado no banco de dados. Vá ao Gerenciador e restaure os padrões.")
+            return
+
         D, X, X_inv = precompute_decay_matrices(lambdas_cadeia)
         tempo_em_anos_max = convert_time_to_years(t_val, t_unit)
         massas_finais = evaluate_chain_decay(D, X, X_inv, vetor_massas_iniciais, tempo_em_anos_max)
@@ -402,18 +478,29 @@ def run_chain_mode_visual(chart_theme):
         
         with col_tabela:
             st.markdown("### Massa Final")
+            
             df_resultado = pd.DataFrame({
                 "Isótopo": cadeia_recortada,
                 "Massa Final (g)": massas_finais
             })
             
-            # FILTRO: Aplica a mesma seleção do gráfico à tabela
-            df_resultado_display = df_resultado[df_resultado["Isótopo"].isin(isotopos_para_plotar)].copy()
+            df_resultado_display = df_resultado.copy()
             df_resultado_display["Massa Final (g)"] = df_resultado_display["Massa Final (g)"].apply(lambda x: f"{x:.4E}")
             st.dataframe(df_resultado_display, hide_index=True, use_container_width=True)
 
         with col_grafico:
             st.markdown("### Evolução Temporal")
+            
+            st.markdown("**Mostrar no Gráfico:**")
+            num_cols = 5 
+            toggles_cols = st.columns(num_cols)
+            isotopos_para_plotar = []
+            
+            for i, iso in enumerate(cadeia_recortada):
+                with toggles_cols[i % num_cols]:
+                    is_active = st.toggle(iso, value=(iso in present_isotopes), key=f"tgl_{iso}")
+                    if is_active:
+                        isotopos_para_plotar.append(iso)
             
             max_t = t_val if t_val > 0 else 100
             t_plot = np.linspace(0, max_t, steps + 1)
@@ -429,9 +516,8 @@ def run_chain_mode_visual(chart_theme):
             if PLOTLY_AVAILABLE:
                 fig = go.Figure()
                 for i, iso in enumerate(cadeia_recortada):
-                    # Só plota se estiver na lista selecionada pelo usuário
                     if iso in isotopos_para_plotar:
-                        y_vals = historico_massas[:, i]
+                        y_vals = np.copy(historico_massas[:, i])
                         y_vals[y_vals < 1e-25] = np.nan 
                         
                         fig.add_trace(go.Scatter(
@@ -442,7 +528,7 @@ def run_chain_mode_visual(chart_theme):
                             hovertemplate=f"<b>{iso}</b><br>Tempo: %{{x:.2f}}<br>Massa: %{{y:.4E}} g<extra></extra>"
                         ))
                     
-                setup_graph_layout(fig, "Decaimento do Recorte", t_unit, "Massa (g)", log_scale, chart_theme, max_t)
+                setup_graph_layout(fig, f"Decaimento do Recorte ({nome_cadeia.split(' ')[0]})", t_unit, "Massa (g)", log_scale, chart_theme, max_t)
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.warning("Instale 'plotly' para visualizar gráficos.")
