@@ -126,6 +126,7 @@ DEFAULT_ISOTOPES = {
     "Po-216":     {"lambda": 1.5e8,      "half_life": 4.6e-9,    "unit": "anos", "atomic_weight": 216.0},
     "Pb-212":     {"lambda": 571.4,      "half_life": 1.21e-3,   "unit": "anos", "atomic_weight": 212.0},
     "Bi-212":     {"lambda": 6013.0,     "half_life": 1.15e-4,   "unit": "anos", "atomic_weight": 212.0},
+    "Po-212":     {"lambda": 7.315e13,   "half_life": 9.47e-15,  "unit": "anos", "atomic_weight": 211.99},
     "Tl-208":     {"lambda": 119436.0,   "half_life": 5.8e-6,    "unit": "anos", "atomic_weight": 208.0},
     "Pb-208":     {"lambda": 0.0,        "half_life": 0.0,       "unit": "anos", "atomic_weight": 207.98}
 }

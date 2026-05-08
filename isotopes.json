@@ -245,6 +245,12 @@
         "unit": "anos",
         "atomic_weight": 212.0
     },
+    "Po-212": {
+        "lambda": 73150000000000.0,
+        "half_life": 9.47e-15,
+        "unit": "anos",
+        "atomic_weight": 211.99
+    },
     "Tl-208": {
         "lambda": 119436.0,
         "half_life": 5.8e-06,
