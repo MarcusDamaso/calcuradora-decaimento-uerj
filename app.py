@@ -239,34 +239,17 @@ def generate_pdf_report(df, title, t_unit):
 def setup_graph_layout(fig, title, x_unit, y_unit, is_log, theme, max_x):
     custom_ticks = np.linspace(0, max_x, 6)
     x_range_max = max_x * 1.05
-    
     fig.update_layout(
         title=dict(text=title, font=dict(family="Georgia", size=20)),
         xaxis_title=f"Tempo ({x_unit})",
         yaxis_title=f"Quantidade ({y_unit})",
         yaxis_type="log" if is_log else "linear",
+        template=theme,
         height=500,
         hovermode="x unified",
-        
-        # --- FORÇANDO CORES CLARAS PARA O PÔSTER ---
-        font=dict(family="Times New Roman", size=14, color="black"), # Força o texto em preto
-        paper_bgcolor="white", # Fundo de fora do gráfico
-        plot_bgcolor="white",  # Fundo de dentro do gráfico
-        
-        yaxis=dict(
-            autorange=True,
-            gridcolor="#e5e5e5", # Linhas de grade em cinza bem clarinho
-            zerolinecolor="#cccccc"
-        ),
-        xaxis=dict(
-            range=[0, x_range_max], 
-            tickmode='array', 
-            tickvals=custom_ticks, 
-            ticktext=[f"{x:.1f}" for x in custom_ticks], 
-            constrain='domain',
-            gridcolor="#e5e5e5", # Linhas de grade em cinza bem clarinho
-            zerolinecolor="#cccccc"
-        )
+        font=dict(family="Times New Roman", size=14),
+        yaxis=dict(autorange=True),
+        xaxis=dict(range=[0, x_range_max], tickmode='array', tickvals=custom_ticks, ticktext=[f"{x:.1f}" for x in custom_ticks], constrain='domain')
     )
 
 # --- INTERFACE ---
