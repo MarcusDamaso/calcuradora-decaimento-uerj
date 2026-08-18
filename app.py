@@ -345,7 +345,7 @@ def run_simple_mode(chart_theme):
             hover_txt = [f"t={t:.2f}<br>Qtd={y:.4E} {unit_label}" for t, y in zip(t_plot, y_vals)]
             fig.add_trace(go.Scatter(x=t_plot, y=y_vals, mode='lines', name=selected_iso, line=dict(color=color, width=3), text=hover_txt, hoverinfo="text"))
             setup_graph_layout(fig, f"Decaimento de {selected_iso}", t_unit, unit_label, log_scale, chart_theme, max_t)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, theme=None)
         else:
             st.warning("Biblioteca 'plotly' não encontrada.")
 
@@ -585,7 +585,7 @@ with st.sidebar:
     st.markdown("---")
     theme = st.radio("Tema", ["Escuro", "Claro"], horizontal=True)
     apply_theme_css(theme)
-    chart_theme = "plotly_dark" if theme == "Escuro" else "plotly"
+    chart_theme = "plotly_dark" if theme == "Escuro" else "plotly_white"
     st.caption(f"© {date.today().year} UERJ")
 
 if page == "Calculadora": render_calculator(chart_theme)
