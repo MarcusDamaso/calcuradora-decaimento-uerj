@@ -1,1 +1,2 @@
-Projeto de iniciação científica que busca estudar o fenomeno fisico do decaimento radioativo , até o momento simples/em cadeia . a aplicação consiste em uma calculadora para conseguir analisar este fenomeno com mais precisão.
+Projeto de iniciação científica que busca estudar o fenomeno fisico do decaimento radioativo , até o momento simples/em cadeia . a aplicação consiste em uma calculadora para conseguir analisar este fenomeno com mais precisão. 
+https://calcuradora-decaimento-uerj-tn9cwrwv8nsxx57mqxhmqg.streamlit.app/
